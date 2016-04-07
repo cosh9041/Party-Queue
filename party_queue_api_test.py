@@ -1,42 +1,37 @@
-"""
-    Unit Testing file for the endpoints api of Party-Queue app
-    Much of the basis for this code comes from:
-    https://stackoverflow.com/questions/20384743/how-to-unit-test-google-cloud-endpoints 
-"""
+""" Unit testing file for party queue api """
+
+import unittest
+import models
+import party_queue_api
 import sys
 sys.path.insert(1, '/home/user/Downloads/google_appengine')
 sys.path.insert(1, '/home/user/Downloads/google_appengine/lib/yaml/lib')
 sys.path.insert(1, '/home/user/workspaces/Party-Queue/lib')
 from google.appengine.ext import testbed
-from google.appengine.ext import endpoints 
-import webtest
+from google.appengine.ext import ndb
+from google.appengine.ext import testbed
 import unittest
-import endpoints
 
 class TestPartyQueueApiTestCase(unittest.TestCase):
-    def setUp(self):
-        tb = testbed.Testbed()
-        tb.setup_env(current_version_id='testbed.version') #needed because endpoints expects a . in this value
-        tb.activate()
-        tb.init_all_stubs()
-        self.testbed = tb
-        app = endpoints.api_server([PartyQueueApi], restricted=False)
-        self.testapp=webtest.TestApp(app)
+    def Setup(self):
+        # Setting up testbed with the method stubs uses an in memory datastore
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        # Clear ndb's in-context cache between tests.
+        # This prevents data from leaking between tests.
+        # Alternatively, you could disable caching by
+        # using ndb.get_context().set_cache_policy(False)
+        ndb.get_context().clear_cache()
 
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_signup(self):
-        self.assertEqual('test', 'not equal', "This test shoud fail")
-        """ 
-        reqmsg = {
-                'username': 'Captain Blackbeard',
-                'email':    'captBlackbeard@pirates.org',
-        }
-        resp = self.testapp.post_json('/_ah/spi/PartyQueueApi.signup')
-        self.assertEqual(resp.json, {'id
-        """
+    def test_build_playlist_response(self):
+        self.AssertEqual(1,1)
 
 # Main: Run Test Cases
 if __name__ == '__main__':
     unittest.main()
+
